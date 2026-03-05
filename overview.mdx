@@ -1,0 +1,271 @@
+---
+title: 'Course Overview'
+description: 'Learn full-stack web development with modern JavaScript frameworks and Symfony'
+---
+
+## Welcome to Internet Programming
+
+This course provides comprehensive training in modern web development, covering both frontend and backend technologies. You'll learn to build dynamic, data-driven applications using industry-standard tools and frameworks.
+
+<CardGroup cols={2}>
+  <Card title="Frontend Development" icon="react" iconType="solid">
+    Master React, TypeScript, and modern build tools with Vite
+  </Card>
+  <Card title="Backend Development" icon="server" iconType="solid">
+    Build robust APIs with Symfony, Doctrine ORM, and PostgreSQL
+  </Card>
+  <Card title="Modern Tooling" icon="hammer" iconType="solid">
+    Work with Docker, npm, and professional development workflows
+  </Card>
+  <Card title="Hands-On Practice" icon="code" iconType="solid">
+    Apply concepts through practical examples and guided exercises
+  </Card>
+</CardGroup>
+
+## Learning Objectives
+
+By the end of this course, you will be able to:
+
+- Build interactive user interfaces with **React** and **TypeScript**
+- Manage application state and handle asynchronous operations with **Axios**
+- Create RESTful APIs using **Symfony** framework
+- Design and implement database schemas with **Doctrine ORM**
+- Containerize applications with **Docker** and **Docker Compose**
+- Work with XML data structures and web service integration
+- Apply modern JavaScript concepts including arrow functions, JSX, and array methods
+- Debug and troubleshoot both frontend and backend applications
+
+## Prerequisites
+
+Before starting this course, you should have:
+
+<Note>
+  **Basic Programming Knowledge**: Familiarity with programming concepts (variables, functions, loops, conditionals)
+</Note>
+
+<Note>
+  **HTML & CSS Fundamentals**: Understanding of basic web markup and styling
+</Note>
+
+<Note>
+  **Command Line Basics**: Ability to navigate directories and run commands in a terminal
+</Note>
+
+### Recommended Tools
+
+- **Node.js** (v18 or higher) - Required for running React projects
+- **Docker Desktop** - For containerized Symfony development
+- **Git** - For version control and repository management
+- **Code Editor** - VS Code, WebStorm, or similar IDE
+
+<Info>
+  The course uses **NVM (Node Version Manager)** to handle multiple Node.js versions across different environments. This allows you to switch between Node versions seamlessly when working on projects with different requirements.
+</Info>
+
+## Course Structure
+
+The repository is organized into three main sections:
+
+### 1. Examples (`ejemplos/`)
+
+Complete, working projects demonstrating key concepts:
+
+<Steps>
+  <Step title="p1-react - React + TypeScript + Vite">
+    Introduction to React with TypeScript, featuring Tailwind CSS integration and modern component patterns. Learn JSX syntax, component composition, and styling with utility-first CSS.
+  </Step>
+  
+  <Step title="p2-axios - HTTP Requests">
+    Working with REST APIs using Axios for data fetching. Implements React Router for navigation and demonstrates GET/POST request handling with real-world API integration.
+  </Step>
+  
+  <Step title="p4-symfony - Symfony Docker">
+    Full-stack backend application with Symfony 8, Doctrine ORM, PostgreSQL database, and Docker containerization. Includes FrankenPHP for high-performance PHP execution and Caddy for automatic HTTPS.
+  </Step>
+</Steps>
+
+### 2. Practices (`practicas/`)
+
+Guided exercises for hands-on learning:
+
+- **p1-xml**: Create well-formed XML documents and work with data structures
+- Additional practices will be added throughout the course
+
+### 3. Documentation (`Doc/`)
+
+Reference materials including the **Glosario.md** which covers essential JavaScript and React concepts such as:
+
+- `.map()` method for array transformation
+- Arrow functions for concise syntax
+- Ternary operators for conditional expressions
+- Error handling with try-catch-throw
+- JSX syntax for React components
+
+## Technologies Covered
+
+<CardGroup cols={3}>
+  <Card title="React 19" icon="react">
+    Modern UI library with hooks and functional components
+  </Card>
+  <Card title="TypeScript 5.9" icon="code">
+    Type-safe JavaScript for robust applications
+  </Card>
+  <Card title="Vite 7" icon="bolt">
+    Lightning-fast build tool and dev server
+  </Card>
+  <Card title="Symfony 8" icon="symfony">
+    Professional PHP framework for enterprise apps
+  </Card>
+  <Card title="Doctrine ORM" icon="database">
+    Database abstraction and entity management
+  </Card>
+  <Card title="Docker" icon="docker">
+    Containerization for consistent development environments
+  </Card>
+  <Card title="Axios" icon="arrow-right-arrow-left">
+    Promise-based HTTP client for API requests
+  </Card>
+  <Card title="Tailwind CSS 4" icon="paintbrush">
+    Utility-first CSS framework for rapid UI development
+  </Card>
+  <Card title="PostgreSQL" icon="database">
+    Powerful relational database system
+  </Card>
+</CardGroup>
+
+## How to Use This Repository
+
+### Setting Up Frontend Projects
+
+Frontend examples use **Vite** with React and TypeScript:
+
+```bash
+# Navigate to a React project
+cd ejemplos/p1-react
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+### Setting Up Backend Projects
+
+Backend examples use **Docker Compose** for consistent environments:
+
+```bash
+# Navigate to the Symfony project
+cd ejemplos/p4-symfony
+
+# Build Docker images
+docker compose build --pull --no-cache
+
+# Start containers
+docker compose up --wait
+
+# Access at https://localhost
+
+# Stop containers
+docker compose down --remove-orphans
+```
+
+<Info>
+  The Symfony Docker setup includes **FrankenPHP** with worker mode for blazing-fast performance, automatic HTTPS with Caddy, HTTP/3 support, and built-in Mercure hub for real-time features.
+</Info>
+
+### Working with Practices
+
+Each practice includes instructions for creating branches and submitting work:
+
+```bash
+# Create a practice branch
+git checkout -b YourName/Practica1
+
+# Work on your solution
+# ...
+
+# Commit and push your work
+git add .
+git commit -m "Complete Practica 1: XML structures"
+git push origin YourName/Practica1
+```
+
+## Development Workflow
+
+<Steps>
+  <Step title="Read the Documentation">
+    Start with the README files in each example or practice directory to understand the objectives and requirements.
+  </Step>
+  
+  <Step title="Explore the Code">
+    Review the source code to understand how concepts are implemented. Pay attention to TypeScript types, React hooks, and Symfony controllers.
+  </Step>
+  
+  <Step title="Run the Examples">
+    Get hands-on experience by running the examples locally. Experiment with modifications to see how changes affect behavior.
+  </Step>
+  
+  <Step title="Complete the Practices">
+    Apply what you've learned by completing the guided practice exercises. These build on the concepts from the examples.
+  </Step>
+  
+  <Step title="Consult the Glossary">
+    Reference `Doc/Glosario.md` whenever you encounter unfamiliar JavaScript or React concepts.
+  </Step>
+</Steps>
+
+## Key Concepts Reference
+
+### JavaScript Fundamentals
+
+The course builds on essential JavaScript concepts covered in the glossary:
+
+- **Array Methods**: `.map()` for transforming data arrays into UI components
+- **Arrow Functions**: Modern, concise function syntax with lexical `this` binding
+- **Ternary Operators**: Conditional expressions for inline logic
+- **Error Handling**: Using `try-catch-throw` for robust error management
+- **JSX**: HTML-like syntax for describing React UIs (requires transpilation)
+
+### React Patterns
+
+- **Functional Components**: Modern React uses functions instead of classes
+- **Hooks**: `useState`, `useEffect`, and custom hooks for state and side effects
+- **Component Composition**: Building complex UIs from small, reusable pieces
+- **Props & State**: Data flow and component communication
+- **React Router**: Client-side routing for single-page applications
+
+### Backend Architecture
+
+- **MVC Pattern**: Symfony's Model-View-Controller structure
+- **ORM**: Doctrine for database abstraction and entity mapping
+- **Dependency Injection**: Symfony's service container for clean architecture
+- **Routing**: Attribute-based routing for API endpoints
+- **Form Handling**: Symfony forms with validation and CSRF protection
+
+## Getting Help
+
+<Card title="Glossary" icon="book" href="/glossary/javascript-concepts">
+  Essential JavaScript and React terminology with examples
+</Card>
+
+<Note>
+  **Development Best Practices**: Always use version control, write descriptive commit messages, test your code before committing, and consult the documentation when you encounter errors.
+</Note>
+
+## Next Steps
+
+Ready to start coding? Here's what to do next:
+
+1. **Set up your development environment** with Node.js, Docker, and Git
+2. **Clone the repository** and explore the project structure
+3. **Run the first example** (p1-react) to see React and Vite in action
+4. **Read the glossary** to familiarize yourself with key concepts
+5. **Start the first practice** when you feel comfortable with the basics
+
+<Info>
+  Each project includes comprehensive README files with setup instructions, troubleshooting tips, and additional documentation in their respective `docs/` directories.
+</Info>

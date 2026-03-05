@@ -1,0 +1,199 @@
+---
+title: 'Development Tools'
+description: 'Essential development tools and error handling concepts including NVM, try/catch/throw.'
+keywords: ['nvm', 'node version manager', 'try catch', 'error handling', 'throw']
+---
+
+# Development Tools
+
+This page covers essential development tools and error handling concepts for JavaScript development.
+
+<AccordionGroup>
+  <Accordion title="NVM (Node Version Manager)">
+    ## What is NVM?
+
+    To simplify it, NVM is a **"Version Manager"**. Think of it as a toolbox for storing versions of Node.js (the runtime environment for executing JavaScript outside the browser). It allows you to have multiple versions installed on your computer at the same time (an older version for a legacy project and a newer one for modern projects) and switch between them easily.
+
+    ## Use Case Example
+
+    A clear example would be if you use macOS in class and Windows at home. This tool allows you to switch between Node.js versions as needed without having to constantly reinstall versions.
+
+    <Tip>
+      NVM is perfect for developers who work on multiple projects that require different Node.js versions.
+    </Tip>
+
+    ## Where NOT to use NVM
+
+    <Warning>
+      Like anything in our profession, a tool isn't suitable for every occasion. Generally, you would **not use NVM in production** (for example, a final server hosting a website). In production, you would install a fixed, stable version; there's no need to be switching versions.
+    </Warning>
+
+    ## Key Benefits
+
+    - Install and manage multiple Node.js versions
+    - Switch between versions quickly
+    - Test applications across different Node.js versions
+    - Isolate project dependencies by Node version
+  </Accordion>
+
+  <Accordion title="TRY - Error Handling">
+    ## Definition
+
+    `try` means "Attempt". It's a safety block. You tell the code: "Try to execute this action, even if it's risky or might fail." If everything goes well, perfect. If something fails, the program doesn't crash; instead, it passes control to the `catch` block.
+
+    ## When to use TRY
+
+    Use `try` when you want to execute code that depends on external factors that could fail:
+
+    - Connecting to a database
+    - Reading a file that might not exist
+    - Requesting data from the internet
+    - Parsing JSON data
+    - API calls
+
+    ## Example
+
+    ```js
+    try {
+      const data = JSON.parse(userInput);
+      console.log(data);
+    } catch (error) {
+      console.log("Invalid JSON format");
+    }
+    ```
+
+    <Warning>
+      **Where NOT to use TRY:**
+      
+      Don't wrap all your code in `try` blocks without reason, as it can hide serious logic errors that you should fix instead of ignore. Be cautious.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="CATCH - Error Trapping">
+    ## Definition
+
+    `catch` means "Trap" or "Catch". It's the next in line after `try`. If the code inside the `try` block fails and throws an error, `catch` traps it. This is where you decide what to do with the error (show a friendly message to the user, save a log, etc.) so the program continues functioning.
+
+    ## Use Case
+
+    Handle errors gracefully:
+    - Show "Could not load image" instead of a white screen
+    - Display user-friendly error messages
+    - Log errors for debugging
+    - Provide fallback behavior
+
+    ## Example
+
+    ```js
+    try {
+      const response = await fetch('/api/data');
+      const data = await response.json();
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      // Show user-friendly message
+      showMessage('Unable to load data. Please try again later.');
+    }
+    ```
+
+    <Danger>
+      **Where NOT to use CATCH:**
+      
+      - It doesn't work by itself; it must always be accompanied by a `try` block
+      - Don't use it to "silence" errors (catch the error and do nothing), because then you'll never know what's failing
+    </Danger>
+
+    <Info>
+      Always handle errors in the `catch` block. At minimum, log them for debugging purposes.
+    </Info>
+  </Accordion>
+
+  <Accordion title="THROW - Error Throwing">
+    ## Definition
+
+    `throw` means "Throw" or "Raise". This command is like raising your hand and shouting: "There's a problem here!" You throw an error so that a `catch` block higher up can trap it and handle it.
+
+    ## Use Case Example
+
+    If a function expects an age and receives `-5`, you would `throw` an error saying: "Age cannot be negative." As you can see, it works together with the previously mentioned commands.
+
+    ## Example
+
+    ```js
+    function setAge(age) {
+      if (age < 0) {
+        throw new Error('Age cannot be negative');
+      }
+      if (age > 150) {
+        throw new Error('Age seems unrealistic');
+      }
+      this.age = age;
+    }
+
+    try {
+      setAge(-5);
+    } catch (error) {
+      console.log(error.message); // "Age cannot be negative"
+    }
+    ```
+
+    <Warning>
+      **Where NOT to use THROW:**
+      
+      Don't use `throw` to control normal program flow. It should only be used for exceptional or incorrect situations.
+    </Warning>
+
+    ## Best Practices
+
+    <CardGroup cols={2}>
+      <Card title="Use Error Objects" icon="circle-exclamation">
+        Always throw proper Error objects: `throw new Error('message')` instead of throwing strings.
+      </Card>
+      <Card title="Descriptive Messages" icon="message">
+        Provide clear, descriptive error messages that help identify the problem.
+      </Card>
+      <Card title="Custom Errors" icon="code">
+        Create custom error classes for specific error types in your application.
+      </Card>
+      <Card title="Document Errors" icon="book">
+        Document what errors a function can throw in its comments or documentation.
+      </Card>
+    </CardGroup>
+  </Accordion>
+</AccordionGroup>
+
+## Complete Error Handling Example
+
+```js
+function processUserData(userData) {
+  try {
+    // Validate input
+    if (!userData) {
+      throw new Error('User data is required');
+    }
+    
+    if (!userData.age || userData.age < 0) {
+      throw new Error('Valid age is required');
+    }
+    
+    // Process data
+    const processed = {
+      ...userData,
+      status: userData.age >= 18 ? 'adult' : 'minor'
+    };
+    
+    return processed;
+    
+  } catch (error) {
+    console.error('Error processing user data:', error.message);
+    // Return default or show user-friendly error
+    return null;
+  }
+}
+
+// Usage
+const result = processUserData({ name: 'Ana', age: 25 });
+```
+
+<Check>
+  Proper error handling makes your applications more robust and provides better user experiences when things go wrong.
+</Check>

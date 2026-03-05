@@ -1,0 +1,196 @@
+---
+title: Task Manager Application
+description: A complete CRUD application built with Symfony 8.0 and Doctrine ORM demonstrating MVC architecture
+---
+
+The Task Manager is a practical example demonstrating core Symfony concepts through a simple task management application with full CRUD functionality.
+
+## Overview
+
+This application showcases:
+
+- **MVC Architecture** - Separation of concerns with controllers, entities, and views
+- **Doctrine ORM** - Database operations with entity mapping and repositories
+- **Symfony Forms** - Form creation, validation, and CSRF protection
+- **PHP 8.4 Attributes** - Modern routing and ORM configuration
+- **RESTful Design** - HTTP method-based routing for CRUD operations
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="List Tasks" icon="list">
+    View all tasks with an index page
+  </Card>
+  
+  <Card title="Create Task" icon="plus">
+    Add new tasks with title and description
+  </Card>
+  
+  <Card title="View Task" icon="eye">
+    Display individual task details
+  </Card>
+  
+  <Card title="Edit Task" icon="pen">
+    Update existing task information
+  </Card>
+  
+  <Card title="Delete Task" icon="trash">
+    Remove tasks with CSRF protection
+  </Card>
+</CardGroup>
+
+## Application Architecture
+
+### MVC Pattern
+
+The application follows Symfony's MVC architecture:
+
+- **Model** - `Task` entity and `TaskRepository`
+- **View** - Twig templates in `templates/task/`
+- **Controller** - `TaskController` handling HTTP requests
+
+### Doctrine ORM Integration
+
+Doctrine provides object-relational mapping, allowing you to work with database records as PHP objects.
+
+## Task Entity
+
+The `Task` entity represents a task in the database:
+
+```php src/Entity/Task.php
+<?php
+
+namespace App\Entity;
+
+use App\Repository\TaskRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: TaskRepository::class)]
+class Task
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $title = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $description = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+}
+```
+
+### Entity Features
+
+<Steps>
+  <Step title="PHP Attributes">
+    Uses PHP 8 attributes instead of annotations for ORM configuration:
+    - `#[ORM\Entity]` - Marks the class as a Doctrine entity
+    - `#[ORM\Column]` - Maps properties to database columns
+    - `#[ORM\Id]` and `#[ORM\GeneratedValue]` - Define auto-increment primary key
+  </Step>
+  
+  <Step title="Typed Properties">
+    All properties use nullable types (`?int`, `?string`) for type safety
+  </Step>
+  
+  <Step title="Fluent Setters">
+    Setter methods return `static` enabling method chaining:
+    ```php
+    $task->setTitle('New Task')->setDescription('Description');
+    ```
+  </Step>
+</Steps>
+
+## Database Schema
+
+The Task entity maps to a database table with the following structure:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER | Auto-increment primary key |
+| title | VARCHAR(255) | Task title |
+| description | TEXT | Detailed task description |
+
+<Note>
+Doctrine automatically generates the database schema from entity definitions using migrations.
+</Note>
+
+## Dependencies
+
+From `composer.json`:
+
+```json composer.json
+{
+    "require": {
+        "php": ">=8.4.18",
+        "doctrine/doctrine-bundle": "^3.2",
+        "doctrine/doctrine-migrations-bundle": "^4.0",
+        "doctrine/orm": "^3.6",
+        "symfony/console": "8.0.*",
+        "symfony/form": "8.0.*",
+        "symfony/framework-bundle": "8.0.*",
+        "symfony/security-csrf": "8.0.*",
+        "symfony/twig-bundle": "8.0.*",
+        "symfony/validator": "8.0.*"
+    },
+    "require-dev": {
+        "symfony/maker-bundle": "^1.66"
+    }
+}
+```
+
+### Key Dependencies
+
+- **doctrine/orm** - Object-relational mapping
+- **symfony/form** - Form creation and validation
+- **symfony/security-csrf** - CSRF token protection
+- **symfony/twig-bundle** - Template rendering
+- **symfony/maker-bundle** - Code generation tools (dev only)
+
+<Warning>
+This application requires PHP 8.4.18 or higher to run properly.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Setup Environment" icon="docker" href="/examples/symfony/docker-setup">
+    Learn how to set up the development environment with Docker
+  </Card>
+  
+  <Card title="CRUD Operations" icon="code" href="/examples/symfony/crud-operations">
+    Explore the controller implementation and form handling
+  </Card>
+</CardGroup>

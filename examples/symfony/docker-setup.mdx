@@ -1,0 +1,381 @@
+---
+title: Docker & FrankenPHP Setup
+description: Containerize Symfony applications with FrankenPHP, PostgreSQL, and Docker Compose
+---
+
+Learn how to run Symfony applications in a Docker environment using FrankenPHP as the application server and PostgreSQL as the database.
+
+## Overview
+
+This setup uses:
+
+- **FrankenPHP** - Modern PHP application server built on Caddy with HTTP/2 and HTTP/3 support
+- **PostgreSQL** - Relational database for data persistence
+- **Docker Compose** - Multi-container orchestration
+
+<Note>
+FrankenPHP is a production-ready PHP application server that combines Caddy web server with PHP, offering better performance than traditional PHP-FPM setups.
+</Note>
+
+## Docker Compose Configuration
+
+The `compose.yaml` file defines the application services:
+
+```yaml compose.yaml
+services:
+  php:
+    image: ${IMAGES_PREFIX:-}app-php
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-localhost}, php:80
+      DEFAULT_URI: https://${SERVER_NAME:-localhost}:${HTTPS_PORT:-443}
+      MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
+      MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@database:5432/${POSTGRES_DB:-app}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
+      MERCURE_URL: ${CADDY_MERCURE_URL:-http://php/.well-known/mercure}
+      MERCURE_PUBLIC_URL: ${CADDY_MERCURE_PUBLIC_URL:-https://${SERVER_NAME:-localhost}:${HTTPS_PORT:-443}/.well-known/mercure}
+      MERCURE_JWT_SECRET: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
+      SYMFONY_VERSION: ${SYMFONY_VERSION:-}
+      STABILITY: ${STABILITY:-stable}
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - name: http
+        target: 80
+        published: ${HTTP_PORT:-80}
+        protocol: tcp
+      - name: https
+        target: 443
+        published: ${HTTPS_PORT:-443}
+        protocol: tcp
+      - name: http3
+        target: 443
+        published: ${HTTP3_PORT:-443}
+        protocol: udp
+
+  database:
+    image: postgres:${POSTGRES_VERSION:-15}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - db_data:/var/lib/postgresql/data:rw
+    ports:
+      - "5432:5432"
+
+volumes:
+  caddy_data:
+  caddy_config:
+  db_data:
+```
+
+### Service Breakdown
+
+<Tabs>
+  <Tab title="PHP Service">
+    **FrankenPHP Container**
+    
+    - Runs the Symfony application
+    - Exposes ports 80 (HTTP), 443 (HTTPS), and 443 UDP (HTTP/3)
+    - Includes Mercure hub for real-time features
+    - Auto-restart unless explicitly stopped
+    - Uses environment variables for configuration
+  </Tab>
+  
+  <Tab title="Database Service">
+    **PostgreSQL Container**
+    
+    - PostgreSQL 15 Alpine image (lightweight)
+    - Health checks to ensure database readiness
+    - Persistent volume for data storage
+    - Exposed on port 5432 for direct access
+    - Configurable credentials via environment variables
+  </Tab>
+  
+  <Tab title="Volumes">
+    **Persistent Storage**
+    
+    - `caddy_data` - Caddy/FrankenPHP data
+    - `caddy_config` - Caddy configuration
+    - `db_data` - PostgreSQL database files
+  </Tab>
+</Tabs>
+
+## Dockerfile
+
+The multi-stage Dockerfile builds optimized images for different environments:
+
+```dockerfile Dockerfile
+#syntax=docker/dockerfile:1
+
+# Versions
+FROM dunglas/frankenphp:1-php8.4 AS frankenphp_upstream
+
+# The different stages of this Dockerfile are meant to be built into separate images
+# https://docs.docker.com/develop/develop-images/multistage-build/#stop-at-a-specific-build-stage
+# https://docs.docker.com/compose/compose-file/#target
+
+
+# Base FrankenPHP image
+FROM frankenphp_upstream AS frankenphp_base
+
+WORKDIR /app
+
+VOLUME /app/var/
+
+# persistent / runtime deps
+# hadolint ignore=DL3008
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+		file \
+		git \
+	; \
+	rm -rf /var/lib/apt/lists/*; \
+	install-php-extensions \
+		@composer \
+		apcu \
+		intl \
+		opcache \
+		zip \
+	;
+
+# https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
+
+###> recipes ###
+###> doctrine/doctrine-bundle ###
+RUN install-php-extensions pdo_pgsql
+###< doctrine/doctrine-bundle ###
+###< recipes ###
+
+COPY --link frankenphp/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/
+COPY --link --chmod=755 frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY --link frankenphp/Caddyfile /etc/frankenphp/Caddyfile
+
+ENTRYPOINT ["docker-entrypoint"]
+
+HEALTHCHECK --start-period=60s CMD curl http://localhost:2019/metrics --silent --show-error --fail --output /dev/null || exit 1
+CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile" ]
+
+# Dev FrankenPHP image
+FROM frankenphp_base AS frankenphp_dev
+
+ENV APP_ENV=dev
+ENV XDEBUG_MODE=off
+ENV FRANKENPHP_WORKER_CONFIG=watch
+
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+
+RUN set -eux; \
+	install-php-extensions \
+		xdebug \
+	;
+
+COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
+
+CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch" ]
+
+# Prod FrankenPHP image
+FROM frankenphp_base AS frankenphp_prod
+
+ENV APP_ENV=prod
+
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+COPY --link frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
+
+# prevent the reinstallation of vendors at every changes in the source code
+COPY --link composer.* symfony.* ./
+RUN set -eux; \
+	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
+
+# copy sources
+COPY --link --exclude=frankenphp/ . ./
+
+RUN set -eux; \
+	mkdir -p var/cache var/log var/share; \
+	composer dump-autoload --classmap-authoritative --no-dev; \
+	composer dump-env prod; \
+	composer run-script --no-dev post-install-cmd; \
+	if [ -f importmap.php ]; then \
+		php bin/console asset-map:compile; \
+	fi; \
+	chmod +x bin/console; sync;
+```
+
+### Build Stages
+
+<Steps>
+  <Step title="Base Image (frankenphp_base)">
+    - Installs system dependencies (file, git)
+    - Adds PHP extensions (composer, apcu, intl, opcache, zip, pdo_pgsql)
+    - Configures PHP and FrankenPHP
+    - Sets up health checks
+  </Step>
+  
+  <Step title="Development Image (frankenphp_dev)">
+    - Uses development PHP configuration
+    - Installs Xdebug for debugging
+    - Enables file watching for auto-reload
+    - Optimized for development workflow
+  </Step>
+  
+  <Step title="Production Image (frankenphp_prod)">
+    - Uses production PHP configuration
+    - Optimizes Composer autoloader
+    - Pre-compiles assets
+    - Smaller image size, better performance
+  </Step>
+</Steps>
+
+## Environment Setup
+
+<Steps>
+  <Step title="Clone the Repository">
+    ```bash
+    git clone <repository-url>
+    cd p4-symfony
+    ```
+  </Step>
+  
+  <Step title="Create Environment File">
+    Create a `.env.local` file with your database credentials:
+    
+    ```bash .env.local
+    POSTGRES_PASSWORD=YourSecurePassword
+    DATABASE_URL="postgresql://app:YourSecurePassword@database:5432/app?serverVersion=15&charset=utf8"
+    ```
+  </Step>
+  
+  <Step title="Build Docker Images">
+    ```bash
+    docker compose build
+    ```
+    
+    This builds the FrankenPHP image with all dependencies.
+  </Step>
+  
+  <Step title="Start Services">
+    ```bash
+    docker compose up -d
+    ```
+    
+    This starts both the PHP and database services in detached mode.
+  </Step>
+  
+  <Step title="Install Dependencies">
+    ```bash
+    docker compose exec php composer install
+    ```
+  </Step>
+  
+  <Step title="Run Database Migrations">
+    ```bash
+    docker compose exec php bin/console doctrine:migrations:migrate
+    ```
+    
+    Creates the database schema from entity definitions.
+  </Step>
+  
+  <Step title="Access the Application">
+    Open your browser and navigate to:
+    - HTTP: `http://localhost`
+    - HTTPS: `https://localhost`
+  </Step>
+</Steps>
+
+<Warning>
+On first run, FrankenPHP generates a self-signed certificate for HTTPS. Your browser will show a security warning that you need to accept.
+</Warning>
+
+## Useful Commands
+
+<CodeGroup>
+
+```bash View Logs
+docker compose logs -f php
+```
+
+```bash Run Symfony Console
+docker compose exec php bin/console
+```
+
+```bash Access PHP Container
+docker compose exec php sh
+```
+
+```bash Stop Services
+docker compose down
+```
+
+```bash Remove Volumes (Reset Database)
+docker compose down -v
+```
+
+```bash Rebuild Images
+docker compose build --no-cache
+```
+
+</CodeGroup>
+
+## Protocol Support
+
+FrankenPHP supports modern web protocols:
+
+- **HTTP/1.1** - Traditional HTTP
+- **HTTP/2** - Multiplexed connections over TLS
+- **HTTP/3** - QUIC-based protocol over UDP
+- **Early Hints** - Preload resources before final response
+- **Mercure** - Real-time updates via Server-Sent Events
+
+<Note>
+HTTP/3 requires UDP port 443 to be accessible. Some corporate networks may block UDP traffic.
+</Note>
+
+## Production Deployment
+
+For production deployment:
+
+1. **Build the production image**:
+   ```bash
+   docker compose -f compose.yaml -f compose.prod.yaml build
+   ```
+
+2. **Set strong environment variables**:
+   - Change `POSTGRES_PASSWORD` to a strong password
+   - Update `MERCURE_JWT_SECRET` to a random secure value
+   - Set `APP_SECRET` in Symfony configuration
+
+3. **Use proper SSL certificates**:
+   - Replace self-signed certificates with valid SSL certificates
+   - Configure Caddy to use Let's Encrypt
+
+4. **Enable opcache**:
+   - Already enabled in production image
+   - Improves PHP performance significantly
+
+<Warning>
+Never use default passwords or secrets in production environments.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="CRUD Operations" icon="code" href="/examples/symfony/crud-operations">
+    Learn how to implement Create, Read, Update, Delete operations
+  </Card>
+  
+  <Card title="Task Manager" icon="list-check" href="/examples/symfony/p4-task-manager">
+    Explore the complete task management application
+  </Card>
+</CardGroup>

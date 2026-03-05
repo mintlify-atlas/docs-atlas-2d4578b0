@@ -1,0 +1,549 @@
+---
+title: CRUD Operations with Doctrine ORM
+description: Learn Create, Read, Update, and Delete operations using Symfony controllers, forms, and Doctrine ORM
+---
+
+This guide demonstrates how to implement full CRUD (Create, Read, Update, Delete) functionality using Symfony's controller system, forms, and Doctrine ORM.
+
+## Task Controller
+
+The `TaskController` handles all CRUD operations for the Task entity:
+
+```php src/Controller/TaskController.php
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Task;
+use App\Form\TaskType;
+use App\Repository\TaskRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+
+#[Route('/task')]
+final class TaskController extends AbstractController
+{
+    #[Route(name: 'app_task_index', methods: ['GET'])]
+    public function index(TaskRepository $taskRepository): Response
+    {
+        return $this->render('task/index.html.twig', [
+            'tasks' => $taskRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/new', name: 'app_task_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $task = new Task();
+        $form = $this->createForm(TaskType::class, $task);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($task);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('task/new.html.twig', [
+            'task' => $task,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_task_show', methods: ['GET'])]
+    public function show(Task $task): Response
+    {
+        return $this->render('task/show.html.twig', [
+            'task' => $task,
+        ]);
+    }
+
+    #[Route('/{id}/edit', name: 'app_task_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Task $task, EntityManagerInterface $entityManager): Response
+    {
+        $form = $this->createForm(TaskType::class, $task);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('task/edit.html.twig', [
+            'task' => $task,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_task_delete', methods: ['POST'])]
+    public function delete(Request $request, Task $task, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->getPayload()->getString('_token'))) {
+            $entityManager->remove($task);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
+    }
+}
+```
+
+## CRUD Operations Breakdown
+
+<Tabs>
+  <Tab title="Read (List & Show)">
+    ### List All Tasks (Index)
+    
+    ```php
+    #[Route(name: 'app_task_index', methods: ['GET'])]
+    public function index(TaskRepository $taskRepository): Response
+    {
+        return $this->render('task/index.html.twig', [
+            'tasks' => $taskRepository->findAll(),
+        ]);
+    }
+    ```
+    
+    **Key Points:**
+    - Route: `/task`
+    - Injects `TaskRepository` via dependency injection
+    - Uses `findAll()` to retrieve all tasks
+    - Renders `task/index.html.twig` template
+    
+    ### Show Single Task
+    
+    ```php
+    #[Route('/{id}', name: 'app_task_show', methods: ['GET'])]
+    public function show(Task $task): Response
+    {
+        return $this->render('task/show.html.twig', [
+            'task' => $task,
+        ]);
+    }
+    ```
+    
+    **Key Points:**
+    - Route: `/task/{id}`
+    - Symfony automatically fetches the Task entity by ID (ParamConverter)
+    - Returns 404 if task not found
+    - Renders task details template
+  </Tab>
+  
+  <Tab title="Create">
+    ### Create New Task
+    
+    ```php
+    #[Route('/new', name: 'app_task_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $task = new Task();
+        $form = $this->createForm(TaskType::class, $task);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($task);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('task/new.html.twig', [
+            'task' => $task,
+            'form' => $form,
+        ]);
+    }
+    ```
+    
+    **Workflow:**
+    
+    <Steps>
+      <Step title="Create Empty Entity">
+        `$task = new Task()` - Initialize a new task object
+      </Step>
+      
+      <Step title="Build Form">
+        `createForm(TaskType::class, $task)` - Create form bound to the task entity
+      </Step>
+      
+      <Step title="Handle Request">
+        `handleRequest($request)` - Process form submission if present
+      </Step>
+      
+      <Step title="Validate & Save">
+        On valid submission:
+        - `persist($task)` - Mark entity for insertion
+        - `flush()` - Execute database INSERT
+        - Redirect to task list
+      </Step>
+    </Steps>
+  </Tab>
+  
+  <Tab title="Update">
+    ### Update Existing Task
+    
+    ```php
+    #[Route('/{id}/edit', name: 'app_task_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Task $task, EntityManagerInterface $entityManager): Response
+    {
+        $form = $this->createForm(TaskType::class, $task);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('task/edit.html.twig', [
+            'task' => $task,
+            'form' => $form,
+        ]);
+    }
+    ```
+    
+    **Key Differences from Create:**
+    - Task entity is auto-fetched by ID parameter
+    - Form pre-populated with existing task data
+    - No need for `persist()` - entity is already managed
+    - Only `flush()` needed to save changes
+    
+    <Note>
+    Since the entity is already managed by Doctrine, calling `persist()` is unnecessary. Doctrine automatically tracks changes to managed entities.
+    </Note>
+  </Tab>
+  
+  <Tab title="Delete">
+    ### Delete Task
+    
+    ```php
+    #[Route('/{id}', name: 'app_task_delete', methods: ['POST'])]
+    public function delete(Request $request, Task $task, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->getPayload()->getString('_token'))) {
+            $entityManager->remove($task);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
+    }
+    ```
+    
+    **Security Features:**
+    - Only accepts POST requests (not GET)
+    - CSRF token validation required
+    - Token format: `delete{taskId}`
+    
+    **Workflow:**
+    <Steps>
+      <Step title="Validate CSRF Token">
+        Ensures the request is legitimate and not forged
+      </Step>
+      
+      <Step title="Remove Entity">
+        `remove($task)` - Mark entity for deletion
+      </Step>
+      
+      <Step title="Execute Delete">
+        `flush()` - Execute database DELETE
+      </Step>
+      
+      <Step title="Redirect">
+        Return to task list with HTTP 303 status
+      </Step>
+    </Steps>
+    
+    <Warning>
+    Always validate CSRF tokens for destructive operations to prevent Cross-Site Request Forgery attacks.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Form Handling
+
+The `TaskType` form class defines the form structure:
+
+```php src/Form/TaskType.php
+<?php
+
+namespace App\Form;
+
+use App\Entity\Task;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class TaskType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('title')
+            ->add('description')
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Task::class,
+        ]);
+    }
+}
+```
+
+### Form Features
+
+<Steps>
+  <Step title="Form Builder">
+    `buildForm()` defines which entity properties to include as form fields
+  </Step>
+  
+  <Step title="Data Binding">
+    `data_class` binds the form to the Task entity, enabling automatic data mapping
+  </Step>
+  
+  <Step title="Field Type Detection">
+    Symfony automatically detects field types from entity property types:
+    - `string` properties become text inputs
+    - `TEXT` columns become textarea fields
+  </Step>
+  
+  <Step title="Validation">
+    Form validation uses entity constraints (can be added via attributes on the entity)
+  </Step>
+</Steps>
+
+<Note>
+The form builder uses method chaining for clean, readable code. Each `add()` call returns the builder instance.
+</Note>
+
+## Repository Pattern
+
+The `TaskRepository` provides a clean interface for database queries:
+
+```php src/Repository/TaskRepository.php
+<?php
+
+namespace App\Repository;
+
+use App\Entity\Task;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+
+/**
+ * @extends ServiceEntityRepository<Task>
+ */
+class TaskRepository extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Task::class);
+    }
+
+    //    /**
+    //     * @return Task[] Returns an array of Task objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('t')
+    //            ->andWhere('t.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('t.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
+
+    //    public function findOneBySomeField($value): ?Task
+    //    {
+    //        return $this->createQueryBuilder('t')
+    //            ->andWhere('t.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
+}
+```
+
+### Built-in Repository Methods
+
+All Doctrine repositories inherit these methods:
+
+| Method | Description | Example |
+|--------|-------------|--------|
+| `find($id)` | Find by primary key | `$repo->find(1)` |
+| `findAll()` | Find all entities | `$repo->findAll()` |
+| `findBy()` | Find by criteria | `$repo->findBy(['status' => 'active'])` |
+| `findOneBy()` | Find one by criteria | `$repo->findOneBy(['title' => 'Test'])` |
+| `count()` | Count entities | `$repo->count(['status' => 'done'])` |
+
+### Custom Query Methods
+
+You can add custom query methods to your repository:
+
+```php
+public function findActiveTasks(): array
+{
+    return $this->createQueryBuilder('t')
+        ->andWhere('t.status = :status')
+        ->setParameter('status', 'active')
+        ->orderBy('t.createdAt', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
+```
+
+**Query Builder Benefits:**
+- Type-safe query construction
+- IDE auto-completion support
+- Protection against SQL injection
+- Reusable query components
+
+## Routing with PHP Attributes
+
+Symfony uses PHP 8 attributes for routing configuration:
+
+```php
+#[Route('/task')]
+final class TaskController extends AbstractController
+{
+    #[Route(name: 'app_task_index', methods: ['GET'])]
+    #[Route('/new', name: 'app_task_new', methods: ['GET', 'POST'])]
+    #[Route('/{id}', name: 'app_task_show', methods: ['GET'])]
+    #[Route('/{id}/edit', name: 'app_task_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}', name: 'app_task_delete', methods: ['POST'])]
+}
+```
+
+### Route Configuration
+
+<CardGroup cols={2}>
+  <Card title="Class-Level Prefix" icon="folder">
+    `#[Route('/task')]` applies `/task` prefix to all controller routes
+  </Card>
+  
+  <Card title="Method-Level Routes" icon="route">
+    Each action has its own route with path, name, and allowed HTTP methods
+  </Card>
+  
+  <Card title="Route Parameters" icon="code">
+    `{id}` in route path becomes method parameter via auto-wiring
+  </Card>
+  
+  <Card title="HTTP Methods" icon="shield">
+    Restrict routes to specific HTTP methods for security and RESTful design
+  </Card>
+</CardGroup>
+
+### Complete Route Structure
+
+| Route | Path | Methods | Action |
+|-------|------|---------|--------|
+| app_task_index | /task | GET | List all tasks |
+| app_task_new | /task/new | GET, POST | Create new task |
+| app_task_show | /task/{id} | GET | Show single task |
+| app_task_edit | /task/{id}/edit | GET, POST | Edit task |
+| app_task_delete | /task/{id} | POST | Delete task |
+
+## Dependency Injection
+
+Symfony's dependency injection provides required services:
+
+```php
+// Inject repository
+public function index(TaskRepository $taskRepository): Response
+
+// Inject entity manager
+public function new(Request $request, EntityManagerInterface $entityManager): Response
+
+// Inject both entity and request
+public function edit(Request $request, Task $task, EntityManagerInterface $entityManager): Response
+```
+
+**Auto-wiring Benefits:**
+- No manual service configuration needed
+- Type-hinted parameters automatically resolved
+- Easy to test with dependency injection
+- Clean, readable controller code
+
+## Entity Manager Operations
+
+The `EntityManagerInterface` provides core database operations:
+
+<CodeGroup>
+
+```php Persist (Insert)
+// Mark new entity for insertion
+$entityManager->persist($task);
+$entityManager->flush(); // Execute INSERT
+```
+
+```php Update
+// No persist needed for managed entities
+$task->setTitle('Updated Title');
+$entityManager->flush(); // Execute UPDATE
+```
+
+```php Remove (Delete)
+// Mark entity for deletion
+$entityManager->remove($task);
+$entityManager->flush(); // Execute DELETE
+```
+
+```php Transaction
+// Multiple operations in one transaction
+$entityManager->persist($task1);
+$entityManager->persist($task2);
+$entityManager->flush(); // Single transaction
+```
+
+</CodeGroup>
+
+<Warning>
+Always call `flush()` to execute database operations. Changes are only persisted when flush() is called.
+</Warning>
+
+## Best Practices
+
+<Steps>
+  <Step title="Use HTTP Methods Correctly">
+    - GET for reading data
+    - POST for creating and deleting (with CSRF)
+    - Use semantic HTTP status codes (303 for redirects)
+  </Step>
+  
+  <Step title="CSRF Protection">
+    Always validate CSRF tokens for state-changing operations (create, update, delete)
+  </Step>
+  
+  <Step title="Repository Pattern">
+    Keep database queries in repositories, not controllers. This separates concerns and improves testability.
+  </Step>
+  
+  <Step title="Form Handling">
+    Use Symfony forms for validation and CSRF protection rather than manual request handling
+  </Step>
+  
+  <Step title="Entity Manager">
+    Call `flush()` only once per request when possible to minimize database transactions
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Task Manager Overview" icon="list-check" href="/examples/symfony/p4-task-manager">
+    Review the complete application architecture
+  </Card>
+  
+  <Card title="Docker Setup" icon="docker" href="/examples/symfony/docker-setup">
+    Learn how to deploy the application with Docker
+  </Card>
+</CardGroup>

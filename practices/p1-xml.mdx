@@ -1,0 +1,226 @@
+---
+title: 'Practice 1: XML'
+description: 'Create well-formed XML documents to structure information'
+---
+
+## Objective
+
+In this practice assignment, you will create a well-formed XML document that structures information in a hierarchical format. This exercise will help you understand XML syntax, document structure, and the importance of proper formatting in markup languages.
+
+<Info>
+  XML (eXtensible Markup Language) is a markup language that defines rules for encoding documents in a format that is both human-readable and machine-readable.
+</Info>
+
+## Assignment Requirements
+
+Create an XML file that contains structured information. Your XML document must be **well-formed**, meaning it follows all XML syntax rules:
+
+<CardGroup cols={2}>
+  <Card title="Proper Nesting" icon="layer-group">
+    All elements must be properly nested with matching opening and closing tags
+  </Card>
+  <Card title="Single Root Element" icon="tree">
+    Document must have exactly one root element containing all other elements
+  </Card>
+  <Card title="Attribute Quotes" icon="quote-right">
+    All attribute values must be enclosed in quotes
+  </Card>
+  <Card title="Case Sensitivity" icon="text">
+    XML is case-sensitive; opening and closing tags must match exactly
+  </Card>
+</CardGroup>
+
+## Instructions
+
+<Steps>
+  <Step title="Create Your Branch">
+    Create a new branch in the `prog-internet` repository using the following naming convention:
+    
+    ```bash
+    # Format: LastNameFirstName/Practica1
+    # Example:
+    QuelaliGaston/Practica1
+    ```
+    
+    Replace with your own last name and first name.
+  </Step>
+  
+  <Step title="Create the XML File">
+    Create a new XML file in your practice directory. You can name it appropriately for your content (e.g., `data.xml`, `information.xml`).
+  </Step>
+  
+  <Step title="Structure Your Information">
+    Define a hierarchical structure for your information. Consider what type of data you want to represent (e.g., personal information, product catalog, course data, etc.).
+  </Step>
+  
+  <Step title="Write Well-Formed XML">
+    Ensure your XML document follows all syntax rules:
+    - Include an XML declaration
+    - Use a single root element
+    - Properly nest all child elements
+    - Close all tags
+    - Quote all attribute values
+  </Step>
+  
+  <Step title="Validate Your XML">
+    Use an XML validator or parser to verify that your document is well-formed. You can use online tools or built-in IDE features.
+  </Step>
+  
+  <Step title="Commit and Push">
+    Commit your XML file to your branch and push it to the remote repository.
+  </Step>
+</Steps>
+
+## Example XML Structure
+
+Here's an example of a well-formed XML document to guide you:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<curso>
+  <informacion>
+    <nombre>Programación en Internet</nombre>
+    <codigo>PI-2026</codigo>
+    <creditos>4</creditos>
+  </informacion>
+  <estudiantes>
+    <estudiante id="001">
+      <nombre>Juan</nombre>
+      <apellido>Pérez</apellido>
+      <email>juan.perez@example.com</email>
+    </estudiante>
+    <estudiante id="002">
+      <nombre>María</nombre>
+      <apellido>González</apellido>
+      <email>maria.gonzalez@example.com</email>
+    </estudiante>
+  </estudiantes>
+  <temas>
+    <tema orden="1">HTML y CSS</tema>
+    <tema orden="2">JavaScript</tema>
+    <tema orden="3">XML y JSON</tema>
+  </temas>
+</curso>
+```
+
+<Note>
+  This is just an example. You should create your own unique structure based on the information you want to represent.
+</Note>
+
+## What is Well-Formed XML?
+
+A well-formed XML document must satisfy these requirements:
+
+### XML Declaration
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+```
+While optional, it's considered good practice to include this at the beginning of your document.
+
+### Single Root Element
+```xml
+<!-- Correct: One root element -->
+<root>
+  <child1>Content</child1>
+  <child2>Content</child2>
+</root>
+
+<!-- Incorrect: Multiple root elements -->
+<root1>Content</root1>
+<root2>Content</root2>
+```
+
+### Proper Nesting
+```xml
+<!-- Correct: Properly nested -->
+<parent>
+  <child>Content</child>
+</parent>
+
+<!-- Incorrect: Overlapping tags -->
+<parent>
+  <child>Content</parent>
+</child>
+```
+
+### Closed Tags
+```xml
+<!-- Correct: All tags closed -->
+<element>Content</element>
+<empty-element />
+
+<!-- Incorrect: Unclosed tag -->
+<element>Content
+```
+
+### Quoted Attributes
+```xml
+<!-- Correct: Quoted attributes -->
+<element attribute="value">Content</element>
+
+<!-- Incorrect: Unquoted attributes -->
+<element attribute=value>Content</element>
+```
+
+<Warning>
+  Pay special attention to special characters in XML. Characters like `<`, `>`, `&`, `"`, and `'` must be escaped using entity references when used in content or attributes.
+</Warning>
+
+## Deliverables
+
+<CardGroup cols={1}>
+  <Card title="XML File" icon="file-code">
+    A well-formed XML document containing structured information
+  </Card>
+  <Card title="Repository Branch" icon="code-branch">
+    Your work committed and pushed to a branch following the naming convention: `YourLastNameYourFirstName/Practica1`
+  </Card>
+</CardGroup>
+
+## Validation Tools
+
+You can use these tools to validate your XML:
+
+- **Online Validators**: Search for "XML validator" to find free online tools
+- **VS Code**: Install XML extensions that provide real-time validation
+- **Command Line**: Use tools like `xmllint` (available on most systems)
+- **Browser**: Modern browsers can parse and display XML files, showing errors if the document is not well-formed
+
+## Tips for Success
+
+<Steps>
+  <Step title="Plan Your Structure">
+    Before writing code, sketch out the hierarchy of your information on paper or in a text file.
+  </Step>
+  
+  <Step title="Start Simple">
+    Begin with a basic structure and add complexity gradually.
+  </Step>
+  
+  <Step title="Validate Often">
+    Check your XML frequently as you build it to catch errors early.
+  </Step>
+  
+  <Step title="Use Meaningful Names">
+    Choose element and attribute names that clearly describe the data they contain.
+  </Step>
+</Steps>
+
+<Info>
+  Remember: A well-formed XML document follows syntax rules, while a valid XML document also conforms to a specific schema or DTD. For this assignment, focus on creating a well-formed document.
+</Info>
+
+## Common Mistakes to Avoid
+
+- Forgetting to close tags
+- Mixing up opening and closing tag names (case sensitivity)
+- Not properly escaping special characters
+- Having multiple root elements
+- Incorrectly nesting elements
+- Forgetting quotes around attribute values
+
+## Resources
+
+- [W3C XML Specification](https://www.w3.org/XML/)
+- [W3Schools XML Tutorial](https://www.w3schools.com/xml/)
+- XML validators and formatters available online

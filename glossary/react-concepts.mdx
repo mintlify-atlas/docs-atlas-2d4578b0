@@ -1,0 +1,85 @@
+---
+title: 'React Concepts'
+description: 'Core React concepts including JSX and React fundamentals.'
+keywords: ['react', 'jsx', 'javascript xml', 'components', 'babel']
+---
+
+# React Concepts
+
+This page covers essential React concepts for building modern web applications.
+
+<AccordionGroup>
+  <Accordion title="JSX (JavaScript XML)">
+    ## Definition
+
+    JSX is a visual blend of HTML and JavaScript. It is used almost exclusively in the React library. JSX allows you to write HTML-like tags (such as `<div>` or `<h1>`) directly within your JavaScript code.
+
+    ## Where is JSX used?
+
+    <CardGroup cols={2}>
+      <Card title="Building Components" icon="cube">
+        When constructing components in React (and similar libraries like Preact or Solid).
+      </Card>
+      <Card title="UI Structure" icon="layer-group">
+        To define how the structure of your application looks.
+      </Card>
+    </CardGroup>
+
+    ## Example
+
+    ```jsx
+    function Welcome() {
+      return (
+        <div>
+          <h1>Hello, World!</h1>
+          <p>Welcome to React</p>
+        </div>
+      );
+    }
+    ```
+
+    <Warning>
+      JSX does not work directly in a standard web browser. Browsers don't understand JSX; you need a translator (like Babel or Vite) to convert JSX into regular JavaScript before it can run.
+    </Warning>
+
+    ## Key Features
+
+    - Write HTML-like syntax in JavaScript
+    - Embed JavaScript expressions using curly braces `{}`
+    - Components can be composed and reused
+    - Requires transpilation before running in browsers
+
+    ## JSX vs HTML Differences
+
+    <AccordionGroup>
+      <Accordion title="className instead of class">
+        ```jsx
+        // HTML
+        <div class="container"></div>
+
+        // JSX
+        <div className="container"></div>
+        ```
+      </Accordion>
+
+      <Accordion title="Self-closing tags">
+        ```jsx
+        // All tags must be properly closed
+        <img src="image.png" />
+        <input type="text" />
+        ```
+      </Accordion>
+
+      <Accordion title="JavaScript expressions">
+        ```jsx
+        const name = "Alice";
+        <h1>Hello, {name}!</h1>
+        ```
+      </Accordion>
+    </AccordionGroup>
+
+    <Info>
+      JSX makes React code more readable and expressive by allowing you to describe UI structure in a familiar HTML-like syntax.
+    </Info>
+  </Accordion>
+</AccordionGroup>

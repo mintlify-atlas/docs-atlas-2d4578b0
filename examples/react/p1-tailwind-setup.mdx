@@ -1,0 +1,232 @@
+---
+title: React + TypeScript + Vite + Tailwind CSS
+description: Set up a modern React project with TypeScript, Vite, and Tailwind CSS v4
+---
+
+This example demonstrates how to create a React application with TypeScript, Vite, and Tailwind CSS v4 using the latest configuration approach.
+
+## Overview
+
+You'll learn how to:
+
+- Initialize a Vite + React + TypeScript project
+- Install and configure Tailwind CSS v4
+- Use the new `@tailwindcss/vite` plugin
+- Create styled components with Tailwind utilities
+
+## Project Setup
+
+<Steps>
+  <Step title="Create Vite Project">
+    Initialize a new Vite project with React and TypeScript:
+
+    ```bash
+    npm create vite@latest my-react-app -- --template react-ts
+    cd my-react-app
+    ```
+  </Step>
+
+  <Step title="Install Dependencies">
+    Install Tailwind CSS v4 and the Vite plugin:
+
+    ```bash
+    npm install tailwindcss @tailwindcss/vite
+    ```
+
+    <Note>
+      Tailwind CSS v4 uses a new Vite plugin approach instead of PostCSS configuration.
+    </Note>
+  </Step>
+
+  <Step title="Configure Vite">
+    Update your `vite.config.ts` to include the Tailwind plugin:
+
+    ```typescript vite.config.ts
+    import { defineConfig } from 'vite'
+    import react from '@vitejs/plugin-react'
+    import tailwindcss from '@tailwindcss/vite'
+
+    export default defineConfig({
+      plugins: [react(), tailwindcss()],
+    })
+    ```
+  </Step>
+
+  <Step title="Import Tailwind CSS">
+    Update your `src/index.css` file to import Tailwind:
+
+    ```css src/index.css
+    @import "tailwindcss";
+    ```
+
+    This single line replaces the traditional three `@tailwind` directives.
+  </Step>
+
+  <Step title="Start Development Server">
+    Run the development server:
+
+    ```bash
+    npm run dev
+    ```
+
+    Your app should now be running with Tailwind CSS fully configured!
+  </Step>
+</Steps>
+
+## Dependencies
+
+Here's the complete `package.json` for this example:
+
+<CodeGroup>
+```json package.json (dependencies)
+{
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwindcss": "^4.0.0"
+  }
+}
+```
+
+```json package.json (devDependencies)
+{
+  "devDependencies": {
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4"
+  }
+}
+```
+</CodeGroup>
+
+## Example Component
+
+Here's the complete `App.tsx` component demonstrating Tailwind CSS utilities:
+
+```tsx src/App.tsx
+import './index.css'
+
+function App() {
+  return (
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
+      <div className="bg-white p-8 rounded-2xl shadow-2xl text-center hover:scale-105 transition-transform duration-300 border-4 border-indigo-500">
+        <h1 className="text-3xl font-bold text-indigo-600 mb-4">
+          ¡Tailwind Configurado! 🚀
+        </h1>
+        <p className="text-gray-600 mb-6">
+          Si ves este texto con estilo y fondo oscuro, el método manual funcionó perfectamente.
+        </p>
+        <div className="flex gap-4 justify-center">
+          <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+            React + TS
+          </span>
+          <span className="px-4 py-2 bg-teal-100 text-teal-700 rounded-full text-sm font-semibold animate-bounce">
+            Vite
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default App
+```
+
+## Key Features Demonstrated
+
+<CardGroup cols={2}>
+  <Card title="Layout Utilities" icon="grid">
+    Using Flexbox utilities like `flex`, `items-center`, `justify-center` for layout
+  </Card>
+
+  <Card title="Responsive Design" icon="mobile">
+    Responsive padding with `p-4` and `p-8` for mobile-first design
+  </Card>
+
+  <Card title="Color Scheme" icon="palette">
+    Tailwind's color palette with `bg-slate-900`, `text-indigo-600`, etc.
+  </Card>
+
+  <Card title="Animations" icon="wand-magic-sparkles">
+    Built-in animations like `animate-bounce` and custom transitions
+  </Card>
+</CardGroup>
+
+## Styling Breakdown
+
+<Tabs>
+  <Tab title="Container">
+    ```tsx
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
+    ```
+
+    - `min-h-screen`: Full viewport height
+    - `bg-slate-900`: Dark background
+    - `flex flex-col`: Vertical flexbox layout
+    - `items-center justify-center`: Center content
+  </Tab>
+
+  <Tab title="Card">
+    ```tsx
+    <div className="bg-white p-8 rounded-2xl shadow-2xl text-center hover:scale-105 transition-transform duration-300 border-4 border-indigo-500">
+    ```
+
+    - `bg-white`: White background
+    - `rounded-2xl`: Large border radius
+    - `shadow-2xl`: Large shadow
+    - `hover:scale-105`: Scale up on hover
+    - `transition-transform duration-300`: Smooth transition
+  </Tab>
+
+  <Tab title="Typography">
+    ```tsx
+    <h1 className="text-3xl font-bold text-indigo-600 mb-4">
+    ```
+
+    - `text-3xl`: Large text size
+    - `font-bold`: Bold font weight
+    - `text-indigo-600`: Indigo color
+    - `mb-4`: Bottom margin
+  </Tab>
+
+  <Tab title="Badges">
+    ```tsx
+    <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+    ```
+
+    - `px-4 py-2`: Horizontal and vertical padding
+    - `bg-blue-100`: Light blue background
+    - `rounded-full`: Fully rounded corners
+    - `animate-bounce`: Built-in bounce animation
+  </Tab>
+</Tabs>
+
+## Running the Project
+
+<CodeGroup>
+```bash Development
+npm run dev
+```
+
+```bash Build
+npm run build
+```
+
+```bash Preview Build
+npm run preview
+```
+</CodeGroup>
+
+<Note>
+  This example uses Tailwind CSS v4's new Vite plugin, which simplifies configuration compared to previous versions.
+</Note>
+
+## Next Steps
+
+- Explore [Tailwind CSS documentation](https://tailwindcss.com/docs) for more utilities
+- Add custom colors and configurations
+- Implement responsive design patterns
+- Try the [HTTP methods example](/examples/react/p2-axios-http) to add data fetching

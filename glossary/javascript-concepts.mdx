@@ -1,0 +1,85 @@
+---
+title: 'JavaScript Concepts'
+description: 'Essential JavaScript concepts including .map(), arrow functions, and ternary operators.'
+keywords: ['javascript', 'map', 'arrow functions', 'ternary operator', 'array methods']
+---
+
+# JavaScript Concepts
+
+This page covers fundamental JavaScript concepts that are essential for modern web development.
+
+<AccordionGroup>
+  <Accordion title=".map() - Array Transformation Method">
+    ## Definition
+
+    `.map()` is an array method that iterates through each element and returns a **new transformed array**.
+
+    ## Syntax
+
+    ```js
+    array.map((elemento) => nuevoValor)
+    ```
+
+    ## Example
+
+    ```js
+    const numeros = [1, 2, 3];
+    const dobles = numeros.map(n => n * 2);
+    // [2, 4, 6]
+    ```
+
+    <Tip>
+      `.map()` always returns a new array of the same length as the original. Use it when you need to transform each element in an array.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Arrow Function (Función Flecha)">
+    ## Definition
+
+    Arrow functions are a modern and more concise way to write functions in JavaScript.
+
+    ## Syntax
+
+    ```js
+    (parametros) => resultado
+    ```
+
+    ## Example
+
+    ```js
+    const sumar = (a, b) => a + b;
+    ```
+
+    <Note>
+      Arrow functions do not have their own `this` context; they inherit it from the surrounding scope.
+    </Note>
+
+    ### When to use arrow functions
+
+    - Callback functions in array methods (`.map()`, `.filter()`, `.reduce()`)
+    - Short, single-expression functions
+    - When you need to preserve the parent `this` context
+  </Accordion>
+
+  <Accordion title="Ternary Operator">
+    ## Definition
+
+    The ternary operator is a shortened form of an `if-else` statement. It returns a value based on a condition.
+
+    ## Syntax
+
+    ```js
+    condición ? valor_si_true : valor_si_false
+    ```
+
+    ## Example
+
+    ```js
+    let mensaje = edad >= 18 ? "Mayor" : "Menor";
+    ```
+
+    <Tip>
+      Use ternary operators for simple conditional assignments. For complex conditions, prefer traditional `if-else` statements for better readability.
+    </Tip>
+  </Accordion>
+</AccordionGroup>
