@@ -25,6 +25,40 @@ This section contains practical Symfony examples from the Internet Programming c
   </Card>
 </CardGroup>
 
+## Basic Controller Example
+
+The repository includes a simple controller example (`LuckyController`) that demonstrates basic Symfony routing and responses:
+
+```php LuckyController.php
+<?php
+namespace App\Controller;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+
+class LuckyController
+{
+    #[Route('/lucky/number')]
+    public function number(): Response
+    {
+        $number = random_int(0, 100);
+
+        return new Response(
+            '<html><body>Lucky number: '.$number.'</body></html>'
+        );
+    }
+}
+```
+
+This example demonstrates:
+- **PHP Attributes for Routing** - Using `#[Route]` attribute to define routes
+- **Simple Response** - Returning HTML content directly without a template
+- **Clean Controller Syntax** - Minimal code for a working endpoint
+
+<Info>
+  This is a basic example showing Symfony routing fundamentals. For production applications, use Twig templates as demonstrated in the Task Manager example.
+</Info>
+
 ## What You'll Learn
 
 <Steps>
