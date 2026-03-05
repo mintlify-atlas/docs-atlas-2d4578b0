@@ -1,0 +1,73 @@
+{
+  "projectType": "general",
+  "projectName": "Internet Programming Course",
+  "projectDescription": "Educational repository containing React, TypeScript, and Symfony examples for learning web development",
+  "theme": "palm",
+  "primaryColor": "#2563eb",
+  "lightColor": "#60a5fa",
+  "darkColor": "#1e40af",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": ["introduction", "overview"]
+          },
+          {
+            "group": "Glossary",
+            "pages": ["glossary/javascript-concepts", "glossary/react-concepts", "glossary/tools"]
+          }
+        ]
+      },
+      {
+        "tab": "Examples",
+        "groups": [
+          {
+            "group": "React Examples",
+            "pages": [
+              "examples/react/overview",
+              "examples/react/p1-tailwind-setup",
+              "examples/react/p2-axios-http"
+            ]
+          },
+          {
+            "group": "Symfony Examples",
+            "pages": [
+              "examples/symfony/overview",
+              "examples/symfony/p4-task-manager",
+              "examples/symfony/docker-setup",
+              "examples/symfony/crud-operations"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Practices",
+        "groups": [
+          {
+            "group": "Assignments",
+            "pages": ["practices/overview", "practices/p1-xml"]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "React + TypeScript + Vite setup examples",
+    "HTTP request handling with Axios",
+    "Symfony framework with Doctrine ORM",
+    "Docker containerization",
+    "Task management CRUD application",
+    "JavaScript/React concept glossary"
+  ],
+  "publicApiSurface": [
+    "React components (App, MetodoGet, MetodoPost)",
+    "Symfony controllers (TaskController, LuckyController)",
+    "Symfony entities (Task)",
+    "Symfony forms (TaskType)",
+    "Task repository methods (findAll)",
+    "React Router routes (/, /get, /post)"
+  ]
+}
